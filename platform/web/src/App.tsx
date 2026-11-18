@@ -157,7 +157,7 @@ export default function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand"><span className="brand-mark"><Command size={17}/></span>forgeops<span className="brand-dot">.</span></div>
-        <div className="org-switch"><div className="org-icon"><Building2 size={16}/></div><div className="org-copy"><strong>{selectedOrganization?.name || "Loading…"}</strong><small>{selectedOrganization?.role || "Workspace"}</small></div><ChevronDown size={15}/></div>
+        <div className="org-switch"><div className="org-icon"><Building2 size={16}/></div><div className="org-copy"><select className="org-select" aria-label="Switch organization" value={organizationId} onChange={event=>setOrganizationId(event.target.value)}>{organizations.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}</select><small>{selectedOrganization?.role || "Workspace"}</small></div><ChevronDown size={15}/></div>
         <span className="nav-caption">WORKSPACE</span>
         <a className="nav-link active"><LayoutDashboard size={17}/> Overview</a>
         <a className="nav-link"><FolderKanban size={17}/> Projects <span className="nav-count">{projects.length}</span></a>
