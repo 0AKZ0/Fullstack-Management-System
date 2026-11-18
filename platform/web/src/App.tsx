@@ -50,7 +50,8 @@ export default function App() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
-  const selectedOrganization = organizations.find(org => org.id === organizationId);\n  const canEditProjects = ["OWNER", "ADMIN", "MANAGER"].includes(selectedOrganization?.role || "");
+  const selectedOrganization = organizations.find(org => org.id === organizationId);
+  const canEditProjects = ["OWNER", "ADMIN", "MANAGER"].includes(selectedOrganization?.role || "");
   const loadProjects = useCallback(async (accessToken: string, orgId: string) => {
     const result = await api<Project[]>("/v1/projects", accessToken, {
       headers: { "x-organization-id": orgId }
