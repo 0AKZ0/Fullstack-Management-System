@@ -49,18 +49,23 @@ The current product boundaries share transactions and a common authorization mod
 
 ## Run locally
 
-Requirements: Node.js 22+, npm 10+, Docker Compose.
+Requirements: Node.js 22+, npm 10+, Docker Compose. You can run the complete stack in containers or run the API and web app separately.
 
 ```bash
 cd platform
+docker compose up --build
+```
+
+Open the web workspace at `http://localhost:8080`; the API and OpenAPI UI are available at `http://localhost:4000` and `http://localhost:4000/docs`. The first container startup applies database migrations. To create the local demo identity, run the seed from the API project after installing its dependencies:
+
+```bash
 cp .env.example .env
-docker compose up -d postgres redis
 npm install
 npm run prisma:generate
-npm run db:migrate
 npm run db:seed
-npm run dev
 ```
+
+For a source-based development loop, start PostgreSQL and Redis with `docker compose up -d postgres redis`, then run the API (`npm run dev`) and web app (`cd web && npm install && npm run dev`) in separate terminals.
 
 API: `http://localhost:4000`  
 OpenAPI UI: `http://localhost:4000/docs`  
@@ -99,7 +104,7 @@ Every tenant-scoped request must provide `x-organization-id`. The API verifies t
 - Request bodies have explicit schemas and payload limits.
 - Security headers and rate limiting are enabled by default.
 
-This repository is an engineering portfolio project, not a claim of production certification. Before a real deployment, configure TLS, managed secrets, backups and restore drills, alerting, retention policies, a threat model, and an independent security review.
+This repository is an engineering portfolio project, not a claim of production certification. The Compose credentials and JWT secret are local-development values only. Before a real deployment, configure TLS, managed secrets, backups and restore drills, alerting, retention policies, a threat model, and an independent security review.
 
 ## Engineering decisions
 
