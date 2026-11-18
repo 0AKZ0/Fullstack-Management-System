@@ -88,7 +88,7 @@ Readiness: `http://localhost:4000/health/ready`
 | Method | Endpoint | Auth | Purpose |
 | --- | --- | --- | --- |
 | POST | `/v1/auth/login` | Public | Exchange credentials for an access token |
-| GET | `/v1/projects` | User + tenant | List projects in the active organization |
+| GET | `/v1/organizations` | User | List organizations the authenticated user belongs to |\n| GET | `/v1/projects` | User + tenant | List projects in the active organization |
 | POST | `/v1/projects` | Admin / manager | Create a project |\n| PATCH | `/v1/projects/:projectId/status` | Admin / manager | Apply a valid project lifecycle transition |
 | GET | `/v1/audit-events` | Admin | Inspect organization audit history |
 
