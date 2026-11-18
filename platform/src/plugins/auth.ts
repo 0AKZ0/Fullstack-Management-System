@@ -7,7 +7,7 @@ export default fp(async app => {
   await app.register(jwt, {
     secret: env.JWT_ACCESS_SECRET,
     sign: { expiresIn: env.JWT_ACCESS_TTL, iss: "forgeops-api", aud: "forgeops-web" },
-    verify: { allowedIss: "forgeops-api", allowedAud: "forgeops-web" }
+    verify: { allowedIss: "forgeops-api", allowedAud: "forgeops-web", algorithms: ["HS256"] }
   });
 
   app.decorate("authenticate", async (request, reply) => {
