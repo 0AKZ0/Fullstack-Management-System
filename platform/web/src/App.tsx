@@ -50,7 +50,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
-  const selectedOrganization = organizations.find(org => org.id === organizationId);
+  const selectedOrganization = organizations.find(org => org.id === organizationId);\n  const canEditProjects = ["OWNER", "ADMIN", "MANAGER"].includes(selectedOrganization?.role || "");
   const loadProjects = useCallback(async (accessToken: string, orgId: string) => {
     const result = await api<Project[]>("/v1/projects", accessToken, {
       headers: { "x-organization-id": orgId }
@@ -87,6 +87,23 @@ export default function App() {
       await loadOrganizations(result.accessToken);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to sign in");
+    } finally { setBusy(false); }
+  }
+
+  async function transitionProject(project: Project) {
+    const status = nextStatus[project.status];
+    if (!status || !selectedOrganization || !canEditProjects) return;
+    setBusy(true); setError(""); setNotice("");
+    try {
+      await api<Project>(`/v1/projects/${project.id}/status`, token, {
+        method: "PATCH",
+        headers: { "x-organization-id": selectedOrganization.id },
+        body: JSON.stringify({ status })
+      });
+      await loadProjects(token, selectedOrganization.id);
+      setNotice(`Project moved to ${status.replace("_", " ")}. The change was audited.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to update project");
     } finally { setBusy(false); }
   }
 
@@ -166,7 +183,7 @@ export default function App() {
         <section className="content-grid">
           <article className="panel projects-panel"><div className="panel-heading"><div><span className="eyebrow">DELIVERY PIPELINE</span><h3>Projects</h3></div><button className="subtle-button" onClick={()=>setShowCreate(true)}><Plus size={14}/> Add project</button></div>
             <div className="table-wrap"><table><thead><tr><th>PROJECT</th><th>STATUS</th><th>LAST UPDATED</th><th></th></tr></thead><tbody>
-              {filteredProjects.map(project=><tr key={project.id}><td><div className="project-cell"><span className="project-mark">{initials(project.name)}</span><div><strong>{project.name}</strong><small>{project.description || "No description provided"}</small></div></div></td><td><span className={`status-pill ${project.status.toLowerCase()}`}><i/>{project.status.replace("_"," ")}</span></td><td className="date-cell">{new Intl.DateTimeFormat("en",{month:"short",day:"numeric",year:"numeric"}).format(new Date(project.updatedAt))}</td><td><button className="icon-action" aria-label={`Open ${project.name}`}><ArrowUpRight size={15}/></button></td></tr>)}
+              {filteredProjects.map(project=><tr key={project.id}><td><div className="project-cell"><span className="project-mark">{initials(project.name)}</span><div><strong>{project.name}</strong><small>{project.description || "No description provided"}</small></div></div></td><td><button type="button" className={`status-pill ${project.status.toLowerCase()} status-action`} onClick={()=>transitionProject(project)} disabled={!canEditProjects||!nextStatus[project.status]||busy} title={nextStatus[project.status]?`Move to ${nextStatus[project.status]}`:"No further transition"}><i/>{project.status.replace("_"," ")}{canEditProjects&&nextStatus[project.status]?" ↗":""}</button></td><td className="date-cell">{new Intl.DateTimeFormat("en",{month:"short",day:"numeric",year:"numeric"}).format(new Date(project.updatedAt))}</td><td><button className="icon-action" aria-label={`Open ${project.name}`}><ArrowUpRight size={15}/></button></td></tr>)}
               {filteredProjects.length===0 && <tr><td colSpan={4}><div className="empty-state"><div className="empty-icon"><BriefcaseBusiness size={20}/></div><strong>{search?"No matching projects":"Your workspace is ready"}</strong><p>{search?"Try another search term.":"Create the first project to start tracking delivery."}</p>{!search&&<button className="primary-button small" onClick={()=>setShowCreate(true)}><Plus size={14}/> Create first project</button>}</div></td></tr>}
             </tbody></table></div>
           </article>
