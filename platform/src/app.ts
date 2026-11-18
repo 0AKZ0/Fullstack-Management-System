@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
@@ -18,6 +19,10 @@ export async function buildApp() {
     trustProxy: env.NODE_ENV === "production"
   });
 
+  await app.register(cors, {
+    origin: env.CORS_ORIGIN.split(",").map(value => value.trim()),
+    credentials: true
+  });
   await app.register(helmet);
   await app.register(rateLimit, { max: 100, timeWindow: "1 minute" });
   await app.register(swagger, {
