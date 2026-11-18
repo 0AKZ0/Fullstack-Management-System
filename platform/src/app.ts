@@ -67,8 +67,9 @@ export async function buildApp() {
   }, { prefix: "/v1" });
 
   app.setErrorHandler((error, request, reply) => {
-    request.log.error({ err: error }, "Unhandled request error");
-    if (error.validation) {
+    request.log.error({ err: error instanceof Error ? error : new Error(String(error)) }, "Unhandled request error");
+    const hasValidationErrors = typeof error === "object" && error !== null && "validation" in error && Boolean(error.validation);
+    if (hasValidationErrors) {
       return reply.code(400).send({ error: "validation_error", message: "Request does not match the API contract" });
     }
     return reply.code(500).send({ error: "internal_error", message: "An unexpected error occurred" });
