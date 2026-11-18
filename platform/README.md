@@ -89,7 +89,7 @@ Readiness: `http://localhost:4000/health/ready`
 | --- | --- | --- | --- |
 | POST | `/v1/auth/login` | Public | Exchange credentials for an access token |
 | GET | `/v1/projects` | User + tenant | List projects in the active organization |
-| POST | `/v1/projects` | Admin / manager | Create a project |
+| POST | `/v1/projects` | Admin / manager | Create a project |\n| PATCH | `/v1/projects/:projectId/status` | Admin / manager | Apply a valid project lifecycle transition |
 | GET | `/v1/audit-events` | Admin | Inspect organization audit history |
 
 Every tenant-scoped request must provide `x-organization-id`. The API verifies that the authenticated user is a member of that organization before accessing tenant data.
@@ -112,7 +112,7 @@ See [docs/architecture/decisions](docs/architecture/decisions) for Architecture 
 
 ## Roadmap
 
-- [x] Modular API foundation, tenant context, role checks and audit trail
+- [x] Modular API foundation, tenant context, role checks and audit trail\n- [x] Project lifecycle state machine with optimistic concurrency control
 - [x] Local PostgreSQL / Redis infrastructure and CI checks
 - [ ] Refresh-token rotation and session revocation
 - [ ] Background jobs with idempotency and retry policies
