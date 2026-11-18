@@ -5,12 +5,13 @@ import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import prismaPlugin from "./plugins/prisma.js";
+import redisPlugin from "./plugins/redis.js";
 import authPlugin from "./plugins/auth.js";
 import tenantPlugin from "./plugins/tenant.js";
 import { authRoutes } from "./modules/auth/routes.js";
+import { organizationRoutes } from "./modules/organizations/routes.js";
 import { projectRoutes } from "./modules/projects/routes.js";
 import { auditRoutes } from "./modules/audit/routes.js";
-import { organizationRoutes } from "./modules/organizations/routes.js";
 import { env } from "./config/env.js";
 
 export async function buildApp() {
@@ -22,10 +23,16 @@ export async function buildApp() {
 
   await app.register(cors, {
     origin: env.CORS_ORIGIN.split(",").map(value => value.trim()),
-    credentials: true
+    credentials: false
   });
   await app.register(helmet);
-  await app.register(rateLimit, { max: 100, timeWindow: "1 minute" });
+  await app.register(prismaPlugin);
+  await app.register(redisPlugin);
+  await app.register(rateLimit, {
+    max: 100,
+    timeWindow: "1 minute",
+    redis: app.redis
+  });
   await app.register(swagger, {
     openapi: {
       info: { title: "ForgeOps API", description: "Multi-tenant operations platform", version: "0.1.0" },
@@ -37,7 +44,6 @@ export async function buildApp() {
     }
   });
   await app.register(swaggerUi, { routePrefix: "/docs" });
-  await app.register(prismaPlugin);
   await app.register(authPlugin);
   await app.register(tenantPlugin);
 
@@ -45,10 +51,11 @@ export async function buildApp() {
   app.get("/health/ready", { schema: { tags: ["Health"] } }, async (_request, reply) => {
     try {
       await app.prisma.$queryRaw`SELECT 1`;
-      return { status: "ready", dependencies: { postgres: "up" } };
+      await app.redis.ping();
+      return { status: "ready", dependencies: { postgres: "up", redis: "up" } };
     } catch (error) {
       app.log.error({ err: error }, "Readiness check failed");
-      return reply.code(503).send({ status: "not_ready", dependencies: { postgres: "down" } });
+      return reply.code(503).send({ status: "not_ready", dependencies: { postgres: "unknown", redis: "unknown" } });
     }
   });
 
