@@ -10,6 +10,7 @@ import tenantPlugin from "./plugins/tenant.js";
 import { authRoutes } from "./modules/auth/routes.js";
 import { projectRoutes } from "./modules/projects/routes.js";
 import { auditRoutes } from "./modules/audit/routes.js";
+import { organizationRoutes } from "./modules/organizations/routes.js";
 import { env } from "./config/env.js";
 
 export async function buildApp() {
@@ -53,6 +54,7 @@ export async function buildApp() {
 
   await app.register(async api => {
     await api.register(authRoutes, { prefix: "/auth" });
+    await api.register(organizationRoutes, { prefix: "/organizations" });
     await api.register(projectRoutes, { prefix: "/projects" });
     await api.register(auditRoutes, { prefix: "/audit-events" });
   }, { prefix: "/v1" });
