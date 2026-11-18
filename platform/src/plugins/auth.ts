@@ -6,7 +6,7 @@ import { env } from "../config/env.js";
 export default fp(async app => {
   await app.register(jwt, {
     secret: env.JWT_ACCESS_SECRET,
-    sign: { expiresIn: env.JWT_ACCESS_TTL, issuer: "forgeops-api", audience: "forgeops-web" },
+    sign: { expiresIn: env.JWT_ACCESS_TTL, iss: "forgeops-api", aud: "forgeops-web" },
     verify: { allowedIss: "forgeops-api", allowedAud: "forgeops-web" }
   });
 
