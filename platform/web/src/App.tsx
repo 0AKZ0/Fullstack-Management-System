@@ -44,7 +44,7 @@ export default function App() {
   const [userName, setUserName] = useState("Workspace admin");
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [organizationId, setOrganizationId] = useState("");
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);\n  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);\n  const [auditRestricted, setAuditRestricted] = useState(false);
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [projectName, setProjectName] = useState("");
@@ -62,7 +62,7 @@ export default function App() {
     setProjects(result);
   }, []);
 
-  const loadOrganizations = useCallback(async (accessToken: string) => {
+  const loadAuditEvents = useCallback(async (accessToken: string, orgId: string) => {\n    try {\n      const result = await api<{ items: AuditEvent[]; nextCursor: string | null }>("/v1/audit-events?limit=5", accessToken, {\n        headers: { "x-organization-id": orgId }\n      });\n      setAuditEvents(result.items);\n      setAuditRestricted(false);\n    } catch {\n      setAuditEvents([]);\n      setAuditRestricted(true);\n    }\n  }, []);\n\n  const loadOrganizations = useCallback(async (accessToken: string) => {
     const result = await api<Organization[]>("/v1/organizations", accessToken);
     setOrganizations(result);
     if (result[0]) setOrganizationId(result[0].id);
@@ -71,9 +71,9 @@ export default function App() {
 
   useEffect(() => {
     if (token && organizationId) {
-      loadProjects(token, organizationId).catch(err => setError(err.message));
+      loadProjects(token, organizationId).catch(err => setError(err.message));\n      loadAuditEvents(token, organizationId);
     }
-  }, [token, organizationId, loadProjects]);
+  }, [token, organizationId, loadProjects, loadAuditEvents]);
 
   const filteredProjects = useMemo(() => projects.filter(project =>
     `${project.name} ${project.description || ""} ${project.status}`.toLowerCase().includes(search.toLowerCase())
@@ -130,7 +130,7 @@ export default function App() {
   }
 
   function logout() {
-    setToken(""); setOrganizations([]); setProjects([]); setOrganizationId("");
+    setToken(""); setOrganizations([]); setProjects([]); setAuditEvents([]); setOrganizationId("");
     setError(""); setNotice("");
   }
 
@@ -193,6 +193,7 @@ export default function App() {
           </article>
           <aside className="panel insight-panel"><div className="panel-heading"><div><span className="eyebrow">PLATFORM HEALTH</span><h3>Workspace integrity</h3></div><span className="health-dot"/></div><div className="health-hero"><div className="health-ring"><ShieldCheck size={23}/></div><div><strong>Protected</strong><span>Tenant context verified</span></div></div><div className="health-list"><div><span>Identity</span><b><Check size={13}/> Enforced</b></div><div><span>Organization access</span><b><Check size={13}/> Scoped</b></div><div><span>Audit events</span><b><Check size={13}/> Transactional</b></div><div><span>API contract</span><b><Check size={13}/> Documented</b></div></div><div className="insight-note"><Sparkles size={14}/><p>Every project write is paired with an audit event in the same database transaction.</p></div></aside>
         </section>
+        <section className="panel audit-panel"><div className="panel-heading"><div><span className="eyebrow">ACCOUNTABILITY</span><h3>Recent audit events</h3></div><span className="audit-count">{auditEvents.length} EVENTS</span></div>{auditRestricted?<div className="audit-empty"><ShieldCheck size={16}/> Audit history is restricted to organization admins.</div>:auditEvents.length===0?<div className="audit-empty">No recorded changes yet. Project activity will appear here.</div>:<div className="audit-list">{auditEvents.map(event=><div className="audit-row" key={event.id}><span className="audit-marker"><Activity size={14}/></span><div><strong>{event.action.replace(".", " / ")}</strong><small>{event.resourceType} · {event.resourceId.slice(0,10)}</small></div><time>{new Intl.DateTimeFormat("en",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(event.occurredAt))}</time></div>)}</div>}</section>
         <footer className="footer"><span>FORGEOPS <i>·</i> OPERATIONS PLATFORM</span><span><ShieldCheck size={12}/> MULTI-TENANT FOUNDATION</span></footer>
       </main>
       {showCreate && <div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setShowCreate(false);}}><form className="modal" onSubmit={handleCreateProject}><div className="modal-head"><div><span className="eyebrow">DELIVERY PIPELINE</span><h3>Create project</h3></div><button type="button" className="icon-action" onClick={()=>setShowCreate(false)}><X size={18}/></button></div><label>Project name<input autoFocus minLength={2} maxLength={120} value={projectName} onChange={e=>setProjectName(e.target.value)} placeholder="e.g. Customer portal" required/></label><label>Description <span>OPTIONAL</span><textarea maxLength={2000} rows={4} value={projectDescription} onChange={e=>setProjectDescription(e.target.value)} placeholder="What outcome should this project deliver?"/></label><div className="modal-foot"><button type="button" className="cancel-button" onClick={()=>setShowCreate(false)}>Cancel</button><button className="primary-button" disabled={busy||!projectName.trim()}>{busy?"Creating…":<><Plus size={15}/> Create project</>}</button></div></form></div>}
