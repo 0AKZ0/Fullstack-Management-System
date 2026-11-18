@@ -1,7 +1,8 @@
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import {
   Activity, ArrowDownRight, ArrowUpRight, Bell, BriefcaseBusiness, Building2,
-  Check, ChevronDown, CircleHelp, Command, FolderKanban, LayoutDashboard,
+  Check, ChevronDown, Command, FolderKanban, LayoutDashboard,
   LogOut, Plus, Search, Settings2, ShieldCheck, Sparkles, Users, X
 } from "lucide-react";
 
