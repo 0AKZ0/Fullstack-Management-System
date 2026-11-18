@@ -6,7 +6,7 @@ const app = await buildApp();
 try {
   await app.listen({ port: env.PORT, host: env.HOST });
 } catch (error) {
-  app.log.fatal({ err: error }, "API startup failed");
+  app.log.fatal({ err: error instanceof Error ? error : new Error(String(error)) }, "API startup failed");
   await app.close();
   process.exit(1);
 }
