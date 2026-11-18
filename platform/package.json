@@ -7,7 +7,7 @@
   "engines": { "node": ">=22" },
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
@@ -17,7 +17,9 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts"
   },
+  "prisma": { "seed": "tsx prisma/seed.ts" },
   "dependencies": {
+    "@fastify/cors": "^10.0.2",
     "@fastify/helmet": "^12.1.0",
     "@fastify/jwt": "^9.1.0",
     "@fastify/rate-limit": "^10.2.1",
@@ -27,6 +29,7 @@
     "argon2": "^0.41.1",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
+    "fastify-plugin": "^5.0.1",
     "ioredis": "^5.4.2",
     "pino": "^9.6.0",
     "zod": "^3.24.1"
