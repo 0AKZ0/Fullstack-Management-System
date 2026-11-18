@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { env } from "../../config/env.js";
 
 export async function authRoutes(app: FastifyInstance) {
   app.post<{ Body: { email: string; password: string } }>("/login", {
@@ -42,7 +43,7 @@ export async function authRoutes(app: FastifyInstance) {
     return {
       accessToken,
       tokenType: "Bearer",
-      expiresIn: "15m",
+      expiresIn: env.JWT_ACCESS_TTL,
       user: { id: user.id, email: user.email, name: user.name }
     };
   });
