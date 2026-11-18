@@ -122,6 +122,7 @@ export default function App() {
         body: JSON.stringify({ status })
       });
       await loadProjects(token, selectedOrganization.id);
+      await loadAuditEvents(token, selectedOrganization.id);
       setNotice(`Project moved to ${status.replace("_", " ")}. The change was audited.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to update project");
@@ -139,6 +140,7 @@ export default function App() {
         body: JSON.stringify({ name: projectName, description: projectDescription })
       });
       await loadProjects(token, selectedOrganization.id);
+      await loadAuditEvents(token, selectedOrganization.id);
       setProjectName(""); setProjectDescription(""); setShowCreate(false);
       setNotice("Project created and recorded in the audit trail.");
     } catch (err) {
