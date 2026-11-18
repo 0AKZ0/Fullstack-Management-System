@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { canCreateProject } from "../../shared/policies.js";
+import { canCreateProject, canTransitionProjectStatus, canUpdateProject } from "../../shared/policies.js";
 
 export async function projectRoutes(app: FastifyInstance) {
   app.get("/", {
