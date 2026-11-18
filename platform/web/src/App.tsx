@@ -13,6 +13,7 @@ type Project = {
   status: "PLANNING" | "ACTIVE" | "ON_HOLD" | "COMPLETED" | "ARCHIVED";
   createdAt: string; updatedAt: string;
 };
+type AuditEvent = { id: string; action: string; resourceType: string; resourceId: string; occurredAt: string; metadata: unknown };
 const nextStatus: Record<Project["status"], Project["status"] | null> = {
   PLANNING: "ACTIVE", ACTIVE: "ON_HOLD", ON_HOLD: "ACTIVE", COMPLETED: "ARCHIVED", ARCHIVED: null
 };
@@ -44,7 +45,9 @@ export default function App() {
   const [userName, setUserName] = useState("Workspace admin");
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [organizationId, setOrganizationId] = useState("");
-  const [projects, setProjects] = useState<Project[]>([]);\n  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);\n  const [auditRestricted, setAuditRestricted] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
+  const [auditRestricted, setAuditRestricted] = useState(false);
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [projectName, setProjectName] = useState("");
@@ -62,7 +65,20 @@ export default function App() {
     setProjects(result);
   }, []);
 
-  const loadAuditEvents = useCallback(async (accessToken: string, orgId: string) => {\n    try {\n      const result = await api<{ items: AuditEvent[]; nextCursor: string | null }>("/v1/audit-events?limit=5", accessToken, {\n        headers: { "x-organization-id": orgId }\n      });\n      setAuditEvents(result.items);\n      setAuditRestricted(false);\n    } catch {\n      setAuditEvents([]);\n      setAuditRestricted(true);\n    }\n  }, []);\n\n  const loadOrganizations = useCallback(async (accessToken: string) => {
+  const loadAuditEvents = useCallback(async (accessToken: string, orgId: string) => {
+    try {
+      const result = await api<{ items: AuditEvent[]; nextCursor: string | null }>("/v1/audit-events?limit=5", accessToken, {
+        headers: { "x-organization-id": orgId }
+      });
+      setAuditEvents(result.items);
+      setAuditRestricted(false);
+    } catch {
+      setAuditEvents([]);
+      setAuditRestricted(true);
+    }
+  }, []);
+
+  const loadOrganizations = useCallback(async (accessToken: string) => {
     const result = await api<Organization[]>("/v1/organizations", accessToken);
     setOrganizations(result);
     if (result[0]) setOrganizationId(result[0].id);
@@ -71,7 +87,8 @@ export default function App() {
 
   useEffect(() => {
     if (token && organizationId) {
-      loadProjects(token, organizationId).catch(err => setError(err.message));\n      loadAuditEvents(token, organizationId);
+      loadProjects(token, organizationId).catch(err => setError(err.message));
+      loadAuditEvents(token, organizationId);
     }
   }, [token, organizationId, loadProjects, loadAuditEvents]);
 
