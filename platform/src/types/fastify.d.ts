@@ -6,6 +6,7 @@ declare module "fastify" {
     prisma: PrismaClient;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     resolveTenant: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    verifyPassword: (hash: string, password: string) => Promise<boolean>;
   }
 
   interface FastifyRequest {
