@@ -13,6 +13,9 @@ type Project = {
   status: "PLANNING" | "ACTIVE" | "ON_HOLD" | "COMPLETED" | "ARCHIVED";
   createdAt: string; updatedAt: string;
 };
+const nextStatus: Record<Project["status"], Project["status"] | null> = {
+  PLANNING: "ACTIVE", ACTIVE: "ON_HOLD", ON_HOLD: "ACTIVE", COMPLETED: "ARCHIVED", ARCHIVED: null
+};
 
 async function api<T>(path: string, token?: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API}${path}`, {
