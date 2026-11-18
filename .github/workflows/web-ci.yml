@@ -2,7 +2,7 @@ name: ForgeOps Web CI
 
 on:
   push:
-    branches: [main, "feat/**", "fix/**"]
+    branches: [main]
     paths:
       - "platform/web/**"
       - ".github/workflows/web-ci.yml"
@@ -11,6 +11,10 @@ on:
     paths:
       - "platform/web/**"
       - ".github/workflows/web-ci.yml"
+
+concurrency:
+  group: forgeops-web-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
