@@ -64,6 +64,17 @@ npm run dev
 
 API: `http://localhost:4000`  
 OpenAPI UI: `http://localhost:4000/docs`  
+
+In a second terminal, start the React workspace:
+
+```bash
+cd platform/web
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Web app: `http://localhost:5173`  
 Liveness: `http://localhost:4000/health/live`  
 Readiness: `http://localhost:4000/health/ready`
 
@@ -102,7 +113,7 @@ See [docs/architecture/decisions](docs/architecture/decisions) for Architecture 
 - [ ] Background jobs with idempotency and retry policies
 - [ ] Organization lifecycle, invitations and member administration
 - [ ] Projects, tasks, milestones and activity timeline
-- [ ] React application with accessible data-dense UI
+- [x] React application with tenant-aware project workspace and responsive UI
 - [ ] OpenTelemetry traces, metrics and load-test baselines
 
 ## License
