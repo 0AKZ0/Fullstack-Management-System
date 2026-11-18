@@ -2,7 +2,7 @@ name: ForgeOps Platform CI
 
 on:
   push:
-    branches: [main, "feat/**", "fix/**"]
+    branches: [main]
     paths:
       - "platform/**"
       - ".github/workflows/platform-ci.yml"
@@ -11,6 +11,10 @@ on:
     paths:
       - "platform/**"
       - ".github/workflows/platform-ci.yml"
+
+concurrency:
+  group: forgeops-api-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
