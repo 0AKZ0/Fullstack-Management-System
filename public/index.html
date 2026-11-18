@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A clean task management dashboard powered by Node.js and SQLite.">
+  <title>Orbit — Management Dashboard</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="#"><span class="brand-mark">O</span><span>orbit<span class="brand-dot">.</span></span></a>
+      <p class="side-label">WORKSPACE</p>
+      <a class="nav-item active" href="#"><span>▦</span> Overview</a>
+      <div class="sidebar-note"><span class="pulse"></span> Local workspace</div>
+      <div class="profile"><div class="avatar">SA</div><div><strong>Workspace</strong><small>Personal board</small></div></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div><span class="eyebrow">WORKSPACE / OVERVIEW</span><h1>Good work starts here.</h1><p>Keep your projects moving, one task at a time.</p></div><span class="date-pill" id="today"></span></header>
+      <section class="stats">
+        <article class="stat-card"><span>Total tasks</span><strong id="total-count">0</strong><small>Across your workspace</small></article>
+        <article class="stat-card"><span>In progress</span><strong id="progress-count">0</strong><small>Currently being worked on</small></article>
+        <article class="stat-card"><span>Completed</span><strong id="done-count">0</strong><small>Nice progress</small></article>
+      </section>
+      <section class="board">
+        <div class="section-head"><div><span class="eyebrow">TASK MANAGER</span><h2>Your tasks</h2></div><button class="primary" id="new-task">＋ New task</button></div>
+        <form class="composer hidden" id="task-form">
+          <label>Task title<input id="task-title" maxlength="120" placeholder="e.g. Prepare weekly report" required></label>
+          <label>Description<textarea id="task-description" maxlength="1000" rows="2" placeholder="Add a few details (optional)"></textarea></label>
+          <div class="form-actions"><button class="quiet" type="button" id="cancel-task">Cancel</button><button class="primary" type="submit">Create task</button></div>
+        </form>
+        <div class="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="todo">To do</button><button class="filter" data-filter="in_progress">In progress</button><button class="filter" data-filter="done">Completed</button></div>
+        <div class="task-list" id="task-list"><div class="empty">Loading your workspace…</div></div>
+        <p class="feedback" id="feedback" role="status"></p>
+      </section>
+      <footer>ORBIT WORKSPACE <span>Built with Express + SQLite</span></footer>
+    </main>
+  </div>
+</body>
+</html>
