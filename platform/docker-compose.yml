@@ -42,6 +42,7 @@ services:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: 4000
+      TRUST_PROXY_HOPS: 0
       DATABASE_URL: postgresql://forgeops:forgeops_local@postgres:5432/forgeops?schema=public
       REDIS_URL: redis://redis:6379
       JWT_ACCESS_SECRET: local-compose-secret-change-before-deployment-2026
