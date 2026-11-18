@@ -10,7 +10,7 @@ ForgeOps is the flagship implementation in this repository. It is intentionally 
 - Explicit membership roles and authorization policies.
 - Password hashing with Argon2id and short-lived signed access tokens.
 - Append-only audit events for important business actions.
-- PostgreSQL as the source of truth; Redis is reserved for caching and asynchronous workloads as those features are introduced.
+- PostgreSQL as the source of truth; Redis provides a shared rate-limit store and readiness checks; it is also the planned foundation for future workers and caching.
 - Typed configuration, structured logs, health/readiness checks and repeatable local infrastructure.
 - Automated type-checking, tests and dependency auditing in CI.
 
