@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: forgeops-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: forgeops
+      POSTGRES_PASSWORD: forgeops_local
+      POSTGRES_DB: forgeops
+    ports:
+      - "5432:5432"
+    volumes:
+      - forgeops_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U forgeops -d forgeops"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: forgeops-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - forgeops_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: forgeops-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4000
+      DATABASE_URL: postgresql://forgeops:forgeops_local@postgres:5432/forgeops?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: local-compose-secret-change-before-deployment-2026
+      JWT_ACCESS_TTL: 15m
+      LOG_LEVEL: info
+      CORS_ORIGIN: http://localhost:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["sh", "-c", "npx prisma migrate deploy && node dist/src/server.js"]
+    ports:
+      - "4000:4000"
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:4000
+    container_name: forgeops-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "8080:8080"
+
+volumes:
+  forgeops_postgres:
+  forgeops_redis:

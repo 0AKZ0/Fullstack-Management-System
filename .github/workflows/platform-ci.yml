@@ -1,0 +1,41 @@
+name: ForgeOps Platform CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "platform/**"
+      - ".github/workflows/platform-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "platform/**"
+      - ".github/workflows/platform-ci.yml"
+
+concurrency:
+  group: forgeops-api-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    env:
+      DATABASE_URL: postgresql://forgeops:forgeops_local@localhost:5432/forgeops?schema=public
+      JWT_ACCESS_SECRET: ci-only-secret-with-at-least-32-characters
+      REDIS_URL: redis://localhost:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npx prisma validate
+      - run: npm run prisma:generate
+      - run: npm run typecheck
+      - run: npm test
